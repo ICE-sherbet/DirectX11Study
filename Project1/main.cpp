@@ -16,12 +16,13 @@
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);    // ウィンドウプロシージャ
 BOOL OnInit(HWND hWnd);     // 初期化
 void OnRender();            // 描画
-
+float redNum = 0;
 
 // パイプラインオブジェクト
 ID3D11Device* g_device;
 ID3D11DeviceContext* g_context;
 IDXGISwapChain*      g_swapChain;
+ID3D11RenderTargetView* g_renderTargetView;
 
 // メイン関数
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
@@ -131,10 +132,10 @@ BOOL OnInit(HWND hWnd)
     for (size_t i = 0; i < driverTypes.size(); i++)
     {
         result = D3D11CreateDeviceAndSwapChain(
-            nullptr,
-            driverTypes[i],
-            nullptr,
-            0,
+            nullptr,//Graphicドライバー nullの場合自動
+            driverTypes[i],// ドライバーの種類
+            nullptr, //知らん
+            0, //描画ふらぐ
             nullptr,
             0,
             D3D11_SDK_VERSION,
@@ -156,12 +157,31 @@ BOOL OnInit(HWND hWnd)
     viewport.MaxDepth = D3D11_MAX_DEPTH;    // 1.0f
     g_context->RSSetViewports(1, &viewport);
 
+    ID3D11Texture2D* backBuffer;
+    g_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)(&backBuffer));
+    g_device->CreateRenderTargetView(backBuffer,nullptr,&g_renderTargetView);
+
+    g_context->OMSetRenderTargets(1, &g_renderTargetView, nullptr);
+
+    float color[4] = { 0.5f,0.0f,1.0f,1.0f };//赤,緑,青,Alpha
+    g_context->ClearRenderTargetView(g_renderTargetView, color);
+
     return TRUE;
 }
 
 // 描画
 void OnRender()
 {
+    redNum += 1.0f / 4096.0f;
+    if (redNum > 1.0f)redNum = 0;
+    float color[4] = { redNum,0.0f,1.0f,1.0f };//赤,緑,青,Alpha
+
+    g_context->ClearRenderTargetView(g_renderTargetView, color);
+
+
     // フレームを最終出力
-    g_swapChain->Present(0, 0);     // フリップ
+    g_swapChain->Present(0 //フリップまでの待ち時間
+        , 0);
+    // フリップ　
+
 }
