@@ -158,7 +158,7 @@ BOOL OnInit(HWND hWnd)
     g_context->RSSetViewports(1, &viewport);
 
     ID3D11Texture2D* backBuffer;
-    g_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)(&backBuffer));
+    g_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
     g_device->CreateRenderTargetView(backBuffer,nullptr,&g_renderTargetView);
 
     g_context->OMSetRenderTargets(1, &g_renderTargetView, nullptr);
