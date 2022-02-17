@@ -1,15 +1,14 @@
 #include <windows.h>
 #include <vector>
+#include <concepts>
 
 // DirectX11のコードセット
 #include <d3d11.h>
 #include<d3dcompiler.h>
-#include<dxgi1_6.h>
 #include <directxmath.h>
 
 // ライブラリ
 #pragma comment(lib, "d3d11.lib")
-#pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"d3dcompiler.lib")
 
 #define WINDOW_CLASS    L"DX11の導入"
@@ -60,10 +59,6 @@ struct ConstantBuffer
     DirectX::XMMATRIX m_WVP;
 };
 
-// マトリックス
-DirectX::XMMATRIX g_world;           // ワールド行列の方向ベクトル
-DirectX::XMMATRIX g_view;            // ビュー行列の方向ベクトル
-DirectX::XMMATRIX g_projection;      // プロジェクション行列の方向ベクトル
 
 // Y軸回転変数
 static FLOAT y = 0;
@@ -354,6 +349,7 @@ VOID OnUpdate()
 redNum += 1.0f / 4096.0f;
     if (redNum > 1.0f)redNum = 0;
 }
+
 // 描画
 void OnRender()
 {
@@ -371,7 +367,6 @@ void OnRender()
     // フレームを最終出力
     g_swapChain->Present(0 //フリップまでの待ち時間
         , 0);
-    // フリップ　
 
 }
 // メモリ解放
